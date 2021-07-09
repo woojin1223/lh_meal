@@ -1,8 +1,10 @@
-library(dict)
 library(dplyr)
 library(magrittr)
+library(purrr)
 library(readr)
 library(stringr)
+
+source("./functions.R")
 
 train <- read_csv("./data/train.csv")
 train %<>% rename(
@@ -26,33 +28,8 @@ train %<>% mutate(
     dinnter_rate = dinner_n / net_total
     )
 
-get_refined_menu <- function(x) {
-    x %<>% 
-        str_remove_all(pattern = "\\(.{1,10}:.{1,10}\\)") %>%  # (쌀: 국내산) 등 제거 
-        str_replace_all(pattern = "/", replacement = " ") %>%  # 쌀밥/잡곡밥 -> 쌀밥 잡곡밥
-        str_replace_all(pattern = "  ", replacement = " ") %>% 
-        str_replace_all(pattern = ",", replacement = " ") %>% 
-        str_trim() %>% 
-        str_split(pattern = " ") %>% 
-        unlist()
-    
-    return(x)
-    }
+lunch_score_dict <- get_score_dict(train$lunch, train$lunch_rate)
+lunch_score <- get_score(train$lunch, lunch_score_dict)
 
-breakfast_menu <- get_refined_menu(train$breakfast)
-lunch_menu     <- get_refined_menu(train$lunch)
-dinner_menu    <- get_refined_menu(train$dinner)
-
-
-temp <- train$lunch
-temp %<>% str_remove_all(pattern = "\\(.{1,10}:.{1,10}\\)") # (쌀: 국내산) 등 제거
-temp %<>% str_replace_all(pattern = "/", replacement = " ") # 쌀밥/잡곡밥 -> 쌀밥 잡곡밥
-temp %<>% str_replace_all(pattern = "  ", replacement = " ")
-temp %<>% str_replace_all(pattern = ",", replacement = " ")
-temp %<>% str_trim()
-temp %>% str_split(pattern = " ") %>% sapply(FUN = length) # 음식의 개수에 큰 차이가 없다.
-
-
-lunch_menu %>% table() %>% as_tibble() %>% arrange(desc(n))
 
 test <- read_csv("./data/test.csv")
