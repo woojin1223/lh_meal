@@ -1,9 +1,11 @@
 get_refined_menu <- function(x) {
-    x %<>% 
-        str_remove_all(pattern = "\\(.{1,10}:.{1,10}\\)") %>%  # (쌀: 국내산) 등 제거 
+    x %<>%
+        str_replace_all(pattern = "\\( New\\)", replacement = "\\(New\\)") %>%
+        str_remove_all(pattern = "\\([가-힣:,./]+\\)?") %>%  # (쌀: 국내산) 등 제거 
+        str_remove_all(pattern = "\\(?[가-힣:,./]+\\)") %>%  # (쌀: 국내산) 등 제거 
         str_replace_all(pattern = "/", replacement = " ") %>%  # 쌀밥/잡곡밥 -> 쌀밥 잡곡밥
-        str_replace_all(pattern = "  ", replacement = " ") %>% 
         str_replace_all(pattern = ",", replacement = " ") %>% 
+        str_replace_all(pattern = "  ", replacement = " ") %>% 
         str_trim() %>% 
         str_split(pattern = " ") %>% 
         unlist() %>% 

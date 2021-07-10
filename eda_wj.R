@@ -31,5 +31,4 @@ train %<>% mutate(
 lunch_score_dict <- get_score_dict(train$lunch, train$lunch_rate)
 lunch_score <- get_score(train$lunch, lunch_score_dict)
 
-
 test <- read_csv("./data/test.csv")
