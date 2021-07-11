@@ -20,18 +20,24 @@ train %<>% rename(
     dinner    = 석식메뉴,
     lunch_n   = 중식계,
     dinner_n  = 석식계
-    )
+)
 
 train %<>% mutate(
-    net_total       = total - (vacation+business),
+    dow             = factor(dow, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
+    net_total       = total - (vacation+business+home),
     lunch_rate      = lunch_n / net_total,
     dinnter_rate    = dinner_n / net_total,
     new_lunch_menu  = get_new_menu(lunch),
     new_dinner_menu = get_new_menu(dinner)
-    )
+)
 
 lunch_score_dict <- get_score_dict(train$lunch, train$lunch_rate)
-lunch_score <- get_score(train$lunch, lunch_score_dict)
+dinner_score_dict <- get_score_dict(train$dinner, train$dinner_rate)
+
+train %<>% mutate(
+    lunch_score  = get_score(lunch, lunch_score_dict),
+    dinner_score = get_score(dinner, dinner_score_dict)
+)
 
 test <- read_csv("./data/test.csv")
 test %<>% rename(
@@ -45,4 +51,4 @@ test %<>% rename(
     breakfast = 조식메뉴,
     lunch     = 중식메뉴,
     dinner    = 석식메뉴
-    )
+)

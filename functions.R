@@ -12,7 +12,7 @@ get_refined_menu <- function(x) {
         setdiff("")
     
     return(x)
-    }
+}
 
 get_score_dict <- function(x, y) {
     # x: menu vector, y: score vector
@@ -36,7 +36,7 @@ get_score_dict <- function(x, y) {
     }
     
     return(score_dict)
-    }
+}
 
 get_score <- function(x, dict) {
     score <- rep(0, length(x))
@@ -55,8 +55,8 @@ get_score <- function(x, dict) {
     }
     
     return(score)
-    }
+}
 
 get_new_menu <- function(x) {
     return(x %>% str_detect(pattern = "New") %>% as.integer())
-    }
+}
