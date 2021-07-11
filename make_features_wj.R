@@ -67,7 +67,7 @@ test %<>% mutate(
 
 test %<>% mutate(
     Lunch_score  = get_score(Lunch, lunch_score_dict),
-    dinner_score = get_score(Dinner, dinner_score_dict)
+    Dinner_score = get_score(Dinner, dinner_score_dict)
 )
 
 write_csv(test, path = "./data/test_wj.csv")
