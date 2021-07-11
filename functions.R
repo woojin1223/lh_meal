@@ -1,21 +1,26 @@
 get_refined_menu <- function(x) {
     x %<>%
         str_replace_all(pattern = "\\( New\\)", replacement = "\\(New\\)") %>%
-        str_remove_all(pattern = "\\([가-힣:,./]+\\)?") %>%  # (쌀: 국내산) 등 제거 
-        str_remove_all(pattern = "\\(?[가-힣:,./]+\\)") %>%  # (쌀: 국내산) 등 제거 
+        str_replace_all(pattern = ".*자기 ?(개|계)발의 ?날.*", replacement = "자기개발의날") %>%
+        str_replace_all(pattern = "가스", replacement = "까스") %>% # 돈가스 -> 돈까스
+        str_replace_all(pattern = "모듬", replacement = "모둠") %>%
+        str_replace_all("(탈탈|타르타르)(소스|D)?", "탈탈소스") %>% # 탈탈, 탈탈소스, 타르타르 등 -> 탈탈소스
+        str_remove_all(pattern = "(\\([0-9가-힣:,./-]+\\)?|\\(?[0-9가-힣:,./-]+\\))") %>%  # (쌀: 국내산), (2/1컷팅해서-고명) 등 제거 
+        str_replace_all(pattern = "(\\* | \\*)", replacement = "\\*") %>% 
+        str_replace_all(pattern = "\\*", replacement = "&") %>%
         str_replace_all(pattern = "/", replacement = " ") %>%  # 쌀밥/잡곡밥 -> 쌀밥 잡곡밥
         str_replace_all(pattern = ",", replacement = " ") %>% 
         str_replace_all(pattern = "  ", replacement = " ") %>% 
         str_trim() %>% 
         str_split(pattern = " ") %>% 
         unlist() %>% 
-        setdiff("")
+        setdiff(c("", "&"))
     
     return(x)
 }
 
 get_score_dict <- function(x, y) {
-    # x: menu vector, y: score vector
+    # x: menu vector, y: rate vector
     score_dict <- list()
     
     for (i in seq_along(x)) {
@@ -43,15 +48,18 @@ get_score <- function(x, dict) {
     
     for (i in seq_along(x)) {
         refined_menu <- get_refined_menu(x[i])
-        n <- length(refined_menu)
+        n <- 0
         
-        if (n == 0) next
+        if (length(refined_menu) == 0) next
         
         for (menu in refined_menu) {
-            score[i] <- score[i] + dict[[menu]]    
+            if (!is.null(dict[[menu]])) {
+                score[i] <- score[i] + dict[[menu]]
+                n <- n + 1
+            }
         }
         
-        score[i] <- score[i] / n
+        if (n > 0) score[i] <- score[i] / n
     }
     
     return(score)
@@ -60,3 +68,4 @@ get_score <- function(x, dict) {
 get_new_menu <- function(x) {
     return(x %>% str_detect(pattern = "New") %>% as.integer())
 }
+
