@@ -42,6 +42,11 @@ train %<>% mutate(
     Dinner_score = get_score(Dinner, dinner_score_dict)
 )
 
+menu_encoding_dict <- get_menu_encoding_dict()
+
+train <- get_menu_encoding(train, "Lunch", menu_encoding_dict)
+train <- get_menu_encoding(train, "Dinner", menu_encoding_dict)
+
 write_csv(train, path = "./data/train_wj.csv")
 
 test <- read_csv("./data/test.csv")
@@ -70,6 +75,7 @@ test %<>% mutate(
     Dinner_score = get_score(Dinner, dinner_score_dict)
 )
 
+test <- get_menu_encoding(test, "Lunch", menu_encoding_dict)
+test <- get_menu_encoding(test, "Dinner", menu_encoding_dict)
+
 write_csv(test, path = "./data/test_wj.csv")
-
-
