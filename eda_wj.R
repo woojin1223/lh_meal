@@ -7,6 +7,7 @@ library(stringr)
 source("./functions.R")
 
 train <- read_csv("./data/train.csv")
+
 train %<>% rename(
     date      = 일자,
     dow       = 요일,
@@ -21,6 +22,8 @@ train %<>% rename(
     lunch_n   = 중식계,
     dinner_n  = 석식계
 )
+
+train %<>% replace_na(list(dinner = ""))
 
 train %<>% mutate(
     dow             = factor(dow, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
