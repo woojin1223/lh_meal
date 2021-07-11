@@ -23,12 +23,26 @@ train %<>% rename(
     )
 
 train %<>% mutate(
-    net_total    = total - (vacation+business),
-    lunch_rate   = lunch_n / net_total,
-    dinnter_rate = dinner_n / net_total
+    net_total       = total - (vacation+business),
+    lunch_rate      = lunch_n / net_total,
+    dinnter_rate    = dinner_n / net_total,
+    new_lunch_menu  = get_new_menu(lunch),
+    new_dinner_menu = get_new_menu(dinner)
     )
 
 lunch_score_dict <- get_score_dict(train$lunch, train$lunch_rate)
 lunch_score <- get_score(train$lunch, lunch_score_dict)
 
 test <- read_csv("./data/test.csv")
+test %<>% rename(
+    date      = 일자,
+    dow       = 요일,
+    total     = 본사정원수,
+    vacation  = 본사휴가자수,
+    business  = 본사출장자수,
+    overtime  = 본사시간외근무명령서승인건수,
+    home      = 현본사소속재택근무자수,
+    breakfast = 조식메뉴,
+    lunch     = 중식메뉴,
+    dinner    = 석식메뉴
+    )
