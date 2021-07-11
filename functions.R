@@ -1,19 +1,26 @@
 get_refined_menu <- function(x) {
-    x %<>%
+    x %<>% 
         str_replace_all(pattern = "\\( New\\)", replacement = "\\(New\\)") %>%
         str_replace_all(pattern = ".*자기 ?(개|계)발의 ?날.*", replacement = "자기개발의날") %>%
         str_replace_all(pattern = "가스", replacement = "까스") %>% # 돈가스 -> 돈까스
         str_replace_all(pattern = "모듬", replacement = "모둠") %>%
         str_replace_all(pattern = "류산슬", replacement = "유산슬") %>%
         str_replace_all(pattern = "자장", replacement = "짜장") %>%
-        str_replace_all("(탈탈|타르타르)(소스|D)?", "탈탈소스") %>% # 탈탈, 탈탈소스, 타르타르 등 -> 탈탈소스
-        str_remove_all(pattern = "(\\([0-9가-힣:,./-]+\\)?|\\(?[0-9가-힣:,./-]+\\))") %>%  # (쌀: 국내산), (2/1컷팅해서-고명) 등 제거 
+        str_replace_all(pattern = "(탈탈|타르타르)(소스|D)?", replacement = "탈탈소스") %>% # 탈탈, 탈탈소스, 타르타르 등 -> 탈탈소스
+        str_remove_all(pattern = "(\\([0-9가-힣:,./-]+\\)?|\\(?[0-9가-힣:,./-]+\\))") %>%   # (쌀: 국내산), (2/1컷팅해서-고명) 등 제거 
         str_replace_all(pattern = "(\\* | \\*)", replacement = "\\*") %>% 
         str_replace_all(pattern = "\\*", replacement = "&") %>%
         str_replace_all(pattern = "/", replacement = " ") %>%  # 쌀밥/잡곡밥 -> 쌀밥 잡곡밥
         str_replace_all(pattern = ",", replacement = " ") %>% 
         str_replace_all(pattern = "  ", replacement = " ") %>% 
-        str_trim() %>% 
+        str_trim() 
+    
+    return(x)
+}
+
+get_refined_menu_vec <- function(x) {
+    x %<>% 
+        get_refined_menu() %>% 
         str_split(pattern = " ") %>% 
         unlist() %>% 
         setdiff(c("", "&"))
@@ -26,7 +33,7 @@ get_score_dict <- function(x, y) {
     score_dict <- list()
     
     for (i in seq_along(x)) {
-        refined_menu <- get_refined_menu(x[i])
+        refined_menu <- get_refined_menu_vec(x[i])
         
         for (menu in refined_menu) {
             if (!(menu %in% names(score_dict))) {
@@ -49,7 +56,7 @@ get_score <- function(x, dict) {
     score <- rep(0, length(x))
     
     for (i in seq_along(x)) {
-        refined_menu <- get_refined_menu(x[i])
+        refined_menu <- get_refined_menu_vec(x[i])
         n <- 0
         
         if (length(refined_menu) == 0) next
@@ -107,7 +114,7 @@ get_menu_encoding_dict <- function() {
     dict[["Clam"]] <- "조개|골뱅이|전복|굴[^(소스)]"
     dict[["Shrimp"]] <- "새우|랍스터|꽃게"
     dict[["Squid"]] <- "골뱅이|낙지|오징어|쭈꾸미|주꾸미|문어"
-    dict[["Cooked_seafood"]] <- "유산슬|해물전|찜||탕수어|맛살"
+    dict[["Cooked_seafood"]] <- "유산슬|해물전|탕수어"
     dict[["Noodle"]] <- "파스타|스파게티|쫄면|라면|짬뽕\\b|국수|우동\\b"
     dict[["China"]] <- "중식|중국|유산슬|짬뽕|짜장|탕수육|마파두부|오향장육|깐풍기|팔보채|팔보반|라조기|기스면|꿔봐로우"
     # dict[["Korea"]] <- ""
@@ -125,9 +132,11 @@ get_menu_encoding <- function(x, y, dict) {
     # y: "Lunch" or "Dinner"
     # dict: menu_encoding_dict
     
+    refined_menu <- x[[y]] %>%  get_refined_menu()
+    
     for (menu in names(dict)) {
         var_name <- paste0(y, "_", menu)
-        x[[var_name]] <- x[[y]] %>% 
+        x[[var_name]] <- refined_menu %>% 
             str_extract_all(pattern = dict[[menu]]) %>% 
             sapply(FUN = length)
     }
