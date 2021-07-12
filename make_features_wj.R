@@ -3,6 +3,7 @@ library(magrittr)
 library(purrr)
 library(readr)
 library(stringr)
+library(tidyr)
 
 source("./functions_wj.R")
 
@@ -26,12 +27,15 @@ train %<>% rename(
 train %<>% replace_na(list(Dinner = ""))
 
 train %<>% mutate(
-    Dayofweek   = factor(Dayofweek, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
-    Net_total   = Total - (Vacation+Business+Home),
-    Rate_lunch  = N_lunch / Net_total,
-    Rate_dinner = N_dinner / Net_total,
-    New_lunch   = get_new_menu(Lunch),
-    New_dinner  = get_new_menu(Dinner)
+    Dayofweek     = factor(Dayofweek, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
+    Net_total     = Total - (Vacation+Business+Home),
+    Rate_vacation = Vacation / Net_total,
+    Rate_business = Business / Net_total,
+    Rate_overtime = Overtime / Net_total,
+    Rate_lunch    = N_lunch / Net_total,
+    Rate_dinner   = N_dinner / Net_total,
+    New_lunch     = get_new_menu(Lunch),
+    New_dinner    = get_new_menu(Dinner)
 )
 
 lunch_score_dict <- get_score_dict(train$Lunch, train$Rate_lunch)
@@ -65,7 +69,7 @@ test %<>% rename(
 
 test %<>% mutate(
     Dayofweek  = factor(Dayofweek, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
-    Net_total  = Total - (Vacation+Business+Home),
+    Net_total  = Total - (Vacation+Home),
     New_lunch  = get_new_menu(Lunch),
     New_dinner = get_new_menu(Dinner)
 )
