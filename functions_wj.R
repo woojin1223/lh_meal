@@ -1,11 +1,17 @@
 get_refined_menu <- function(x) {
-    x %<>% 
+    x %<>%
+        # &(오리엔탈|칠리|머스타드|소스|드레싱|장|청|쌈|양념|케찹|소금) <-- 삭제하기
         str_replace_all(pattern = "\\( New\\)", replacement = "\\(New\\)") %>%
         str_replace_all(pattern = ".*자기 ?(개|계)발의 ?날.*", replacement = "자기개발의날") %>%
         str_replace_all(pattern = "가스", replacement = "까스") %>% # 돈가스 -> 돈까스
         str_replace_all(pattern = "모듬", replacement = "모둠") %>%
+        str_replace_all(pattern = "베추", replacement = "배추") %>%
         str_replace_all(pattern = "류산슬", replacement = "유산슬") %>%
         str_replace_all(pattern = "자장", replacement = "짜장") %>%
+        str_replace_all(pattern = "도너츠", replacement = "도넛") %>%
+        str_replace_all(pattern = "커틀렛", replacement = "커틀릿") %>%
+        str_replace_all(pattern = "D", replacement = "드레싱") %>%
+        str_replace_all(pattern = "S", replacement = "소스") %>%
         str_replace_all(pattern = "(탈탈|타르타르)(소스|D)?", replacement = "탈탈소스") %>% # 탈탈, 탈탈소스, 타르타르 등 -> 탈탈소스
         str_remove_all(pattern = "(\\([0-9가-힣:,./-]+\\)?|\\(?[0-9가-힣:,./-]+\\))") %>%   # (쌀: 국내산), (2/1컷팅해서-고명) 등 제거 
         str_replace_all(pattern = "(\\* | \\*)", replacement = "\\*") %>% 
@@ -92,13 +98,17 @@ get_menu_encoding_dict <- function() {
     # Clam: "조개|골뱅이|전복|굴[^(소스)]"
     # Shrimp: "새우|랍스터|꽃게"
     # Squid: '골뱅이|낙지|오징어|쭈꾸미|주꾸미|문어'
-    # Cooked_seafood: '유산슬|해물전|찜||탕수어|맛살'
-    # Noodle: "파스타|스파게티|쫄면|라면|짬뽕\\b|국수|우동\\b"
+    # Cooked_seafood: '유산슬|해물전|찜|탕수어|맛살'
+    # Noodle: "파스타|스파게티|쫄면|라면|짬뽕\\b|국수|우동\\b|[^고]사리|나가사키면"
     # China: "중식|중국|유산슬|짬뽕|짜장|탕수육|마파두부|오향장육|깐풍기|팔보채|팔보반|라조기|기스면|꿔봐로우|"
     # Korea: ""
     # Japan: "일본|스시|교자|까스|초밥|우동\\b|스키야키|라멘|일식|소바|가라아게|야(키|끼)|사시미|샤브샤브|나베|오니기리|(규|츠|타|코|텐|슈|케|쿠|끼|니|비|나|게|카)동"
     # Italy: "이탈리아|이태리|파스타|스파게티|피자|스테이크"
     # School: "볶이|김밥|순대|라면|닭강정|[가-힣]*튀김[^(우동)]"
+    
+    # --- 추가 ---
+    # Nuts: "견과류"
+    # Bread: "빵|꽈배기|도넛"
     
     dict <- list()
     dict[["Kimchi"]] <- "[가-힣]+김치|[가-힣]+두기|[가-힣]+겉절이+|[가-힣]+박지"
@@ -115,7 +125,7 @@ get_menu_encoding_dict <- function() {
     dict[["Shrimp"]] <- "새우|랍스터|꽃게"
     dict[["Squid"]] <- "골뱅이|낙지|오징어|쭈꾸미|주꾸미|문어"
     dict[["Cooked_seafood"]] <- "유산슬|해물전|탕수어"
-    dict[["Noodle"]] <- "파스타|스파게티|쫄면|라면|짬뽕\\b|국수|우동\\b"
+    dict[["Noodle"]] <- "파스타|스파게티|쫄면|라면|짬뽕\\b|국수|우동\\b|[^고]사리|나가사키면"
     dict[["China"]] <- "중식|중국|유산슬|짬뽕|짜장|탕수육|마파두부|오향장육|깐풍기|팔보채|팔보반|라조기|기스면|꿔봐로우"
     # dict[["Korea"]] <- ""
     dict[["Japan"]] <- "일본|스시|교자|까스|초밥|우동\\b|라멘|일식|소바|가라아게|야(키|끼)|사시미|샤브샤브|나베|오니기리|(규|츠|타|코|텐|슈|케|쿠|끼|니|비|나|게|카)동"

@@ -4,7 +4,7 @@ library(purrr)
 library(readr)
 library(stringr)
 
-source("./functions.R")
+source("./functions_wj.R")
 
 train <- read_csv("./data/train.csv")
 
