@@ -116,33 +116,34 @@ get_menu_encoding_dict <- function() {
     # 없음
     
     dict <- list()
-    dict[["Kimchi"]]         <- "[가-힣]+김치|[가-힣]+두기|[가-힣]+겉절이+|[가-힣]+박지"
-    dict[["Desert"]]         <- "요거트|쥬시쿨|요구르트|[가-힣]+D|[가-힣]*음료|[가-힣]*호떡|식혜|청포도|바나나|복숭아|오렌지|수박|[가-힣]*토마토|[가-힣]+주스|[가-힣]*아이스티|[가-힣]+빵|[가-힣]*케익|요플레|[가-힣]*츄러스|[가-힣]*화채|푸딩"
+    dict[["Kimchi"]]         <- "김치|깍두기|겉절이|박지"
+    dict[["Desert"]]         <- "요거트|쥬시쿨|요구르트|음료|호떡|식혜|청포도|바나나|복숭아|오렌지|수박|토마토|주스|아이스티|빵|케익|요플레|츄러스|화채|푸딩"
     dict[["Soup"]]           <- ".국\\b|.탕\\b"
-    dict[["Stew"]]           <- "[가-힣]+찌개\\b"
-    dict[["Salad"]]          <- "[가-힣]*샐러드"
-    dict[["Sub_main"]]       <- "[가-힣]*생채|[가-힣]*무침|[가-힣]*나물|[가-힣]*볶음|[가-힣]*구이|[가-힣]*찜|[가-힣*]+쌈|[가-힣]*조림|[가-힣]*잎지|[가-힣*]*초장|[가-힣]*감자|[가-힣]*고구마|[가-힣]*두부|[가-힣]*말랭이|[가-힣]*파래김|[가-힣]*떡볶이|[가-힣]*부추전|[가-힣]*숙회|[가-힣]*스틱|탕평채|[가-힣]*냉채|[가-힣*]*양념장|[가-힣*]*잡채"
+    dict[["Stew"]]           <- "찌개"
+    dict[["Salad"]]          <- "샐러드"
+    dict[["Sub_main"]]       <- "생채|무침|나물|볶음|구이|찜|[가-힣*]+쌈|조림|잎지|초장|감자|고구마|두부|말랭이|파래김|떡볶이|.전|숙회|스틱|탕평채|냉채|양념장|잡채"
     dict[["Pork"]]           <- "장조림|바베큐|떡갈비|장육|수육|폭립|차돌|족발|보쌈|돼지|제육|돈육|[^소]불고기|돈|목살|돼지갈비|삼겹|깐풍|유린기|탕수육|두루치기|등갈비|동파육"
     dict[["Beef"]]           <- "장조림|바베큐|떡갈비|소고기|쇠|소불고기|쇠|쇠고기|우육|소갈비"
     dict[["Chicken"]]        <- "후라이드|윙|닭|치킨|백숙|삼계"
     dict[["Duck"]]           <- "오리"
     dict[["Processed_meat"]] <- "미트|소세지|너비아니|함박|완자|햄"
     dict[["Fish"]]           <- "연어|장어|열기|고등어|삼치|꽁치|갈치|가자미|굴비|조기|생선|임연수|동태|명태|코다리|홍어|황태|참치|멸치|적어|대구"
-    dict[["Clam"]]           <- "조개|골뱅이|전복|굴[^(소스)]"
+    dict[["Clam"]]           <- "조개|골뱅이|전복|굴[^소스]"
     dict[["Shrimp"]]         <- "새우|랍스터|꽃게|크랩"
     dict[["Squid"]]          <- "골뱅이|낙지|오징어|쭈꾸미|주꾸미|문어"
     dict[["Cooked_seafood"]] <- "유산슬|해물전|탕수어"
     dict[["Noodle"]]         <- "파스타|스파게티|.면|짬뽕\\b|국수|우동\\b|[^고]사리"
     dict[["China"]]          <- "중식|중국|유산슬|짬뽕|짜장|탕수육|마파두부|오향장육|깐풍기|팔보채|팔보반|라조기|기스면|꿔바로우"
-    # dict[["Korea"]]        <- ""
     dict[["Japan"]]          <- "일본|스시|교자|까스|초밥|우동\\b|라멘|일식|소바|가라아게|야(키|끼)|사시미|샤브샤브|나베|오니기리|(규|츠|타|코|텐|슈|케|쿠|끼|니|비|나|게|카)동"
     dict[["Italy"]]          <- "이탈리아|이태리|파스타|스파게티|피자|스테이크"
-    dict[["School"]]         <- "볶이|김밥|순대|라면|닭강정|[가-힣]*튀김[^(우동)]"
+    dict[["School"]]         <- "볶이|김밥|순대|라면|닭강정|[가-힣]*튀김[^우동]"
     dict[["Nuts"]]           <- "견과류|호두|땅콩|잣|아몬드"
     dict[["Bread"]]          <- "빵|꽈배기|도넛"
     dict[["Egg"]]            <- "계란"
     dict[["Vegetable"]]      <- "야채|채소|파프리카"
-    dict[["Rice_cake"]]      <- "떡|부꾸미"
+    dict[["Rice_cake"]]      <- "떡[^갈비]|부꾸미" # 떡갈비 포함 안 시키게 하기
+    dict[["Pan_cake"]]       <- ".전\\b"
+    dict[["Mushroom"]]       <- "버섯"
     
     
     
@@ -175,3 +176,53 @@ jaccard <- function(x, y) {
         return(sum(pmin(x, y)) / (sum(x)+sum(y)))
     }
 }
+
+get_sim_matrix <- function(test_menus, meal_time, dict) {
+    # meal_time: "Lunch" or "Dinner"
+    # dict: lunch_score_dict or dinner_score_dict
+    
+    train_menus <- names(dict)
+    train_scores <- as.numeric(dict)
+    train_df <- tibble(train_menus)
+    colnames(train_df) <- meal_time
+    menu_encoding_dict <- get_menu_encoding_dict()
+    train_df %<>% get_menu_encoding(meal_time, menu_encoding_dict)
+    train_df %<>% select(starts_with(paste0(meal_time, "_"))) %>% as.matrix()
+    
+    test_menus %<>% get_refined_menu_vec() %>% unique()
+    new_menus <- test_menus[test_menus %!in% train_menus]
+    new_df <- tibble(new_menus)
+    colnames(new_df) <- meal_time
+    new_df %<>% get_menu_encoding(meal_time, menu_encoding_dict)
+    new_df %<>% select(starts_with(paste0(meal_time, "_"))) %>% as.matrix()
+    
+    sim_matrix <- as_tibble(matrix(0, nrow = nrow(train_df), ncol = nrow(new_df)))
+    colnames(sim_matrix) <- new_menus
+    
+    for (i in 1:nrow(new_df)) {
+        sim_matrix[, i] <- apply(train_df, 1, function(x) jaccard(x, new_df[i, ]))
+    }
+    
+    sim_matrix %<>% 
+        as_tibble() %>% 
+        mutate(menu = train_menus, score = train_scores)
+    
+    return(sim_matrix)
+}
+
+get_update_score_dict <- function(sim_matrix, dict) {
+    n <- ncol(sim_matrix)
+    new_menus <- colnames(sim_matrix)[1:(n - 2)]
+    
+    for (new_menu in new_menus) {
+        dict[[new_menu]] <- sim_matrix %>% 
+            select(new_menu, "menu", "score") %>% 
+            arrange(desc(eval(as.name(new_menu)))) %>% 
+            slice(1:5) %>% 
+            pull("score") %>% 
+            mean()
+    }
+    
+    return(dict)
+}
+
