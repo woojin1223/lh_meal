@@ -24,6 +24,7 @@ train %<>%
     )
 
 write_csv(train, "./data/train_wj.csv")
+# write_csv(train_wj, "./data/train_wj.csv")
 
 test <- read_csv("./data/test_wj.csv")
 test %<>% 
@@ -33,5 +34,6 @@ test %<>%
     )
 
 write_csv(test, "./data/test_wj.csv")
+# write_csv(test_wj, "./data/test_wj.csv")
 
 

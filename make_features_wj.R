@@ -7,6 +7,8 @@ library(tidyr)
 
 source("./functions_wj.R")
 
+# train -------------------------------------------------------------------
+
 train <- read_csv("./data/train.csv")
 
 train %<>% rename(
@@ -38,6 +40,9 @@ train %<>% mutate(
     New_dinner    = get_new_menu(Dinner)
 )
 
+train %<>% get_menu_encoding("Lunch", menu_encoding_dict)
+train %<>% get_menu_encoding("Dinner", menu_encoding_dict)
+
 lunch_score_dict <- get_score_dict(train$Lunch, train$Rate_lunch)
 dinner_score_dict <- get_score_dict(train$Dinner, train$Rate_dinner)
 
@@ -48,10 +53,9 @@ train %<>% mutate(
 
 menu_encoding_dict <- get_menu_encoding_dict()
 
-train <- get_menu_encoding(train, "Lunch", menu_encoding_dict)
-train <- get_menu_encoding(train, "Dinner", menu_encoding_dict)
+write_csv(train, file = "./data/train_wj.csv")
 
-write_csv(train, path = "./data/train_wj.csv")
+# test --------------------------------------------------------------------
 
 test <- read_csv("./data/test.csv")
 test %<>% rename(
@@ -68,18 +72,27 @@ test %<>% rename(
 )
 
 test %<>% mutate(
-    Dayofweek  = factor(Dayofweek, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
-    Net_total  = Total - (Vacation+Home),
-    New_lunch  = get_new_menu(Lunch),
-    New_dinner = get_new_menu(Dinner)
+    Dayofweek     = factor(Dayofweek, levels = c("월", "화", "수", "목", "금"), labels = c(1, 2, 3, 4, 5)),
+    Net_total     = Total - (Vacation+Home),
+    Rate_vacation = Vacation / Net_total,
+    Rate_business = Business / Net_total,
+    Rate_overtime = Overtime / Net_total,
+    New_lunch     = get_new_menu(Lunch),
+    New_dinner    = get_new_menu(Dinner)
 )
+
+test %<>% get_menu_encoding("Lunch", menu_encoding_dict)
+test %<>% get_menu_encoding("Dinner", menu_encoding_dict)
+
+lunch_sim_matrix <- get_sim_matrix(test$Lunch, "Lunch", lunch_score_dict)
+dinner_sim_matrix <- get_sim_matrix(test$Dinner, "Dinner", dinner_score_dict)
+
+lunch_score_dict %<>% get_update_score_dict(lunch_sim_matrix)
+dinner_score_dict %<>% get_update_score_dict(dinner_sim_matrix)
 
 test %<>% mutate(
     Lunch_score  = get_score(Lunch, lunch_score_dict),
     Dinner_score = get_score(Dinner, dinner_score_dict)
 )
 
-test <- get_menu_encoding(test, "Lunch", menu_encoding_dict)
-test <- get_menu_encoding(test, "Dinner", menu_encoding_dict)
-
-write_csv(test, path = "./data/test_wj.csv")
+write_csv(test, file = "./data/test_wj.csv")

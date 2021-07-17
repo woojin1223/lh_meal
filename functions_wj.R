@@ -210,7 +210,7 @@ get_sim_matrix <- function(test_menus, meal_time, dict) {
     return(sim_matrix)
 }
 
-get_update_score_dict <- function(sim_matrix, dict) {
+get_update_score_dict <- function(dict, sim_matrix) {
     n <- ncol(sim_matrix)
     new_menus <- colnames(sim_matrix)[1:(n - 2)]
     
